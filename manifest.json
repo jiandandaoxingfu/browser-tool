@@ -1,0 +1,41 @@
+{
+  "name": "浏览器工具箱",
+  "manifest_version": 2,
+  "version": "1.0.0",
+  "author": "JMx",
+  "homepage_url": "http://github.com/jiandandaoxingfu/browser-tools",
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "64": "icon.png"
+  },
+
+  "description": "浏览器工具箱",
+  "permissions": [
+    "tabs"
+  ],
+
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "32": "icon.png",
+      "48": "icon.png",
+      "64": "icon.png"
+    }
+  },
+
+  "content_scripts": [
+    {
+    	"matches": [
+    		  "http://*/*",
+          "https://*/*"],
+    	"js": [
+        	"content-script/back2top/index.js", 
+          "content-script/sci-hub/index.js", 
+          "content-script/weibo-player/index.js"],
+    	"run_at": "document_end"
+  	}
+  ]
+}
