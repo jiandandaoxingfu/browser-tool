@@ -14,6 +14,7 @@ class Downloader {
 		this.state_arr = []; 
 		this.video_count = 0;
 		this.downloaded_count = 0;
+		this.isdownload = !1;
 		this.tic = new Date().getTime();
 	}
 
@@ -25,9 +26,11 @@ class Downloader {
   			responseType: 'text',
   			headers: headers
   		}).then( res => {
-  			let match = res.data.match(/\n\/.*?index\.m3u8\n/);
-  			if( match ) {
-  				this_.m3u8_url = this_.root_url.replace(/\.com\/.*/, '.com' + match[0].slice(1, -1));
+  			let m1 = res.data.match(/\n\/.*?index\.m3u8\n/),
+  				m2 = res.data.indexOf('#EXT-X-ENDLIST') > 0;
+  			if( m1 || m2 ) {
+  				this_.m3u8_url = m2 ? this_.root_url
+  									: this_.root_url.replace(/\.com\/.*/, '.com' + match[0].slice(1, -1));
   				this_.get_video_urls();
   			}
 		}).catch( e => {
@@ -43,12 +46,13 @@ class Downloader {
   			responseType: 'text',
   			headers: headers
   		}).then( res => {
-  			let match = res.data.match(/\nhttps:.*?ts\n/g);
+  			let match = res.data.match(/\nhttps:.*?\n/g);
   			if( match ) {
   				this_.video_urls = match.map(a => a.slice(1, -1));
-  				this_.video_count = 10 // this_.video_urls.length;
+  				this_.video_count = this_.video_urls.length;
   				this_.state_arr = new Array(this_.video_count).join(',').split(',').map( s => 0);
   				this_.start();
+  				this_.update_state();
   			}
 		}).catch( e => {
 			console.log(e)
@@ -142,7 +146,7 @@ class Merger {
     }
 }
 
-let downloader = new Downloader(10, 'https://cdn.haofajz.com/20210722/HEkBhSc8/index.m3u8');
+let downloader = new Downloader(10, 'https://ts3.510yh.cc/20210120/NZjgSSfD/1000kb/hls/index.m3u8');
 let merger = new Merger();
 downloader.get_m3u8_url();
-downloader.update_state();
+if ( downloader.isdownload ) merger.merge()
