@@ -30,7 +30,7 @@ class Downloader {
   				m2 = res.data.indexOf('#EXT-X-ENDLIST') > 0;
   			if( m1 || m2 ) {
   				this_.m3u8_url = m2 ? this_.root_url
-  									: this_.root_url.replace(/\.com\/.*/, '.com' + match[0].slice(1, -1));
+  									: this_.root_url.replace(/\.com\/.*/, '.com' + m1[0].slice(1, -1));
   				this_.get_video_urls();
   			}
 		}).catch( e => {
@@ -46,9 +46,14 @@ class Downloader {
   			responseType: 'text',
   			headers: headers
   		}).then( res => {
-  			let match = res.data.match(/\nhttps:.*?\n/g);
+  			let match = res.data.match(/\n.*?\/[a-zA-Z0-9]+\.ts\n/g);
   			if( match ) {
-  				this_.video_urls = match.map(a => a.slice(1, -1));
+  				this_.video_urls = match.map(a => a.slice(1, -1)).map(a => {
+  					if (a.indexOf('https:') < 0) {
+  						a = this_.root_url.match(/.*?\.com/)[0] + a;
+  					}
+  					return a;
+  				});
   				this_.video_count = this_.video_urls.length;
   				this_.state_arr = new Array(this_.video_count).join(',').split(',').map( s => 0);
   				this_.start();
@@ -74,17 +79,26 @@ class Downloader {
 			url: this_.video_urls[i],
   			method: 'GET',
   			responseType: 'stream',
-  			headers: headers
+  			headers: headers,
   		}).then( res => {
   			let stream = res.data.pipe( fs.createWriteStream(`F:/movie/temp/${i+1}.ts`, {end: false}));
+  			let flag = false;
+  			const next = () => {
+  				if (!flag) {
+					flag = true;
+					this_.next();
+				}
+  			}
   			stream.on('error', err => {
-				this_.next();
+  				next();
 			})
 
   			stream.on('finish', err => {
-				this_.next();
+  				next();
 			})
+			setTimeout( next, 2000);
 		}).catch( e => {
+			console.log(e);
 			console.log(`第 ${i} 个下载出错`);
 			this_.next();
 		})
@@ -146,7 +160,8 @@ class Merger {
     }
 }
 
-let downloader = new Downloader(10, 'https://ts3.510yh.cc/20210120/NZjgSSfD/1000kb/hls/index.m3u8');
+let downloader = new Downloader(10, 'https://v.kdianbo.com/20220810/1uIcDMGu/2000kb/hls/index.m3u8');
 let merger = new Merger();
+// merger.merge()
 downloader.get_m3u8_url();
 if ( downloader.isdownload ) merger.merge()
