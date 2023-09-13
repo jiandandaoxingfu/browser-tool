@@ -41,8 +41,7 @@
   	},
     {
       "matches": [
-          "https://translate.google.com/*",
-          "https://www.deepl.com/*"
+          "https://translate.google.com/*"
       ],
       "js": [
           "content-script/translate-remove-line-break.js"
