@@ -2,7 +2,18 @@ function removeLineBreaks(text) {
   return text.replace(/[\r\n]+/g, ' ').replace('', '');
 }
 
+(function() {
+  let div = document.createElement('div');
+  div.style = "position: absolute; top: 24px; left: 305px; width: 120px; height: 40px; z-index: 9999;";
+  div.innerHTML = `
+    <input type="checkbox" id="removeLineBreaks" name="removeLineBreaks" checked />
+    <label for="removeLineBreaks">移除换行符</label>
+  `
+  document.body.appendChild(div);
+})()
+
 document.addEventListener('paste', function (event) {
+  if (!document.getElementById('removeLineBreaks').checked) return;
   event.preventDefault();
   navigator.clipboard.readText().then(text => {
     const newText = removeLineBreaks(text);
