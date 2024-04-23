@@ -33,7 +33,6 @@
           "https://*/*"
       ],
     	"js": [
-        	"content-script/back2top/index.js", 
           "content-script/sci-hub/index.js", 
           "content-script/weibo-player/index.js"
       ],
