@@ -10,9 +10,10 @@ function readDiaryEntries(diaryFolderPath) {
     .filter(file => file.endsWith('.md'))
     .map(file => ({
       date: file.replace('.md', ''),
+      btime: file.birthtime,
       content: fs.readFileSync(path.join(diaryFolderPath, file), 'utf8')
     }))
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
+    .sort((a, b) => new Date(a.birthtime) - new Date(b.birthtime));
 }
 
 function buildContent(diaryEntries) {
